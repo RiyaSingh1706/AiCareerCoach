@@ -20,7 +20,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private com.aicareercoach.entity.User user;
+    private com.aiCareerCoach.AiCareer.Entity.User user;
 
     @Column(nullable = false, unique = true, length = 512)
     private String token;
