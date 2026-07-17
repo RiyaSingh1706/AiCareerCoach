@@ -1,7 +1,7 @@
 package com.aiCareerCoach.AiCareer.controller;
 
 import com.aiCareerCoach.AiCareer.dto.analysis.AnalysisJobResponse;
-import com.aiCareerCoach.AiCareer.dto.queue.AiJobPayload;
+import com.aiCareerCoach.AiCareer.queue.AiJobPayload;
 import com.aiCareerCoach.AiCareer.entity.*;
 import com.aiCareerCoach.AiCareer.enums.AnalysisStatus;
 import com.aiCareerCoach.AiCareer.queue.AiJobProducer;

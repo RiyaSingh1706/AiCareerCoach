@@ -20,6 +20,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    private static final long REFRESH_TOKEN_EXPIRY_DAYS = 7;
+
     public AuthService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository,
                        PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
@@ -29,61 +31,72 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest req) {
-        if (userRepository.findByEmail(req.email()).isPresent()) {
+        if (userRepository.existsByEmail(req.email())) {
             throw new IllegalArgumentException("Email already registered");
         }
-        System.out.println(req.email());
+
         User user = User.builder()
-                .email(req.email())
                 .name(req.name())
+                .email(req.email())
                 .password(passwordEncoder.encode(req.password()))
                 .role(Role.USER)
                 .build();
-        return issueTokens(userRepository.save(user));
+        User saved = userRepository.save(user);
+
+        return issueTokens(saved);
     }
 
     public AuthResponse login(LoginRequest req) {
         User user = userRepository.findByEmail(req.email())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        if (user.getPassword() == null || !passwordEncoder.matches(req.password(), user.getPassword())) {
+
+        if (!passwordEncoder.matches(req.password(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
-        return issueTokens(user);
-    }
-
-    public AuthResponse refresh(RefreshRequest req) {
-        RefreshToken stored = refreshTokenRepository.findByToken(req.refreshToken())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
-
-        if (stored.isRevoked() || stored.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Refresh token expired or revoked");
-        }
-
-        User user = userRepository.findById(stored.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        stored.setRevoked(true); // rotate
-        refreshTokenRepository.save(stored);
 
         return issueTokens(user);
-    }
-
-    public void logout(String refreshToken) {
-        refreshTokenRepository.findByToken(refreshToken)
-                .ifPresent(rt -> { rt.setRevoked(true); refreshTokenRepository.save(rt); });
     }
 
     private AuthResponse issueTokens(User user) {
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole().name());
         String refreshTokenValue = jwtService.generateRefreshTokenValue();
 
-        refreshTokenRepository.save(RefreshToken.builder()
-                .token(refreshTokenValue)
+        RefreshToken refreshToken = RefreshToken.builder()
                 .userId(user.getId())
-                .expiryDate(LocalDateTime.now().plusSeconds(jwtService.getRefreshTokenExpirationMs() / 1000))
+                .token(refreshTokenValue)
+                .expiryDate(LocalDateTime.now().plusDays(REFRESH_TOKEN_EXPIRY_DAYS))
                 .revoked(false)
-                .build());
+                .build();
+        refreshTokenRepository.save(refreshToken);
 
-        return new AuthResponse(accessToken, refreshTokenValue, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
+        return new AuthResponse(accessToken, refreshTokenValue,
+                user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
+
+    public AuthResponse refresh(RefreshRequest req) {
+        RefreshToken storedToken = refreshTokenRepository.findByToken(req.refreshToken())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+
+        if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Refresh token expired or revoked");
+        }
+
+        User user = userRepository.findById(storedToken.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User no longer exists"));
+
+        String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole().name());
+
+        return new AuthResponse(newAccessToken, storedToken.getToken(),
+                user.getId(), user.getName(), user.getEmail(), user.getRole().name());
+    }
+
+    public void logout(String refreshTokenValue) {
+        refreshTokenRepository.findByToken(refreshTokenValue)
+                .ifPresent(token -> {
+                    token.setRevoked(true);
+                    refreshTokenRepository.save(token);
+                });
+    }
+
+
 }

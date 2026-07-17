@@ -1,7 +1,6 @@
 package com.aiCareerCoach.AiCareer.queue;
 
 import com.aiCareerCoach.AiCareer.dto.ai.CompleteAnalysisResponse;
-import com.aiCareerCoach.AiCareer.dto.queue.AiJobPayload;
 import com.aiCareerCoach.AiCareer.entity.AnalysisReport;
 import com.aiCareerCoach.AiCareer.enums.AnalysisStatus;
 import com.aiCareerCoach.AiCareer.repository.AnalysisReportRepository;
@@ -51,6 +50,14 @@ public class AiJobListener {
                 processJob(payload);
             } catch (Exception e) {
                 System.out.println("AI job processing failed: " + e.getMessage());
+                Throwable t = e.getCause();
+                int depth = 1;
+                while (t != null) {
+                    System.out.println("  ".repeat(depth) + "caused by [" + t.getClass().getName() + "]: " + t.getMessage());
+                    t = t.getCause();
+                    depth++;
+                }
+                try { Thread.sleep(2000); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
             }
         }
     }

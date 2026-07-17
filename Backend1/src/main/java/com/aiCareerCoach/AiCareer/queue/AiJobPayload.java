@@ -1,4 +1,4 @@
-package com.aiCareerCoach.AiCareer.dto.queue;
+package com.aiCareerCoach.AiCareer.queue;
 
 public record AiJobPayload(
         Long analysisReportId,

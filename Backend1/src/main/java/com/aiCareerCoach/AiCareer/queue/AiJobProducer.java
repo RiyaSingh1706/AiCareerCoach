@@ -1,6 +1,5 @@
 package com.aiCareerCoach.AiCareer.queue;
 
-import com.aiCareerCoach.AiCareer.dto.queue.AiJobPayload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
