@@ -4,12 +4,11 @@ import com.aiCareerCoach.AiCareer.dto.Resume.ResumeResponse;
 import com.aiCareerCoach.AiCareer.entity.Resume;
 import com.aiCareerCoach.AiCareer.entity.User;
 import com.aiCareerCoach.AiCareer.repository.ResumeRepository;
-import com.aiCareerCoach.AiCareer.service.SupabaseStorageService;
+import com.aiCareerCoach.AiCareer.service.S3StorageService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,9 +16,9 @@ import java.util.List;
 public class ResumeController {
 
     private final ResumeRepository resumeRepository;
-    private final SupabaseStorageService storageService;
+    private final S3StorageService storageService;
 
-    public ResumeController(ResumeRepository resumeRepository, SupabaseStorageService storageService) {
+    public ResumeController(ResumeRepository resumeRepository, S3StorageService storageService) {
         this.resumeRepository = resumeRepository;
         this.storageService = storageService;
     }
