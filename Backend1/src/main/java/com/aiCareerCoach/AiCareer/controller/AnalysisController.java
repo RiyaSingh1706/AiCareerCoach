@@ -49,17 +49,25 @@ public class AnalysisController {
 
     @GetMapping("/{id}")
     public AnalysisReportResponse getReport(@PathVariable Long id) {
-        AnalysisReport report = analysisReportRepository.findById(id).orElseThrow();
+        AnalysisReport r = analysisReportRepository.findById(id).orElseThrow();
+        return toDto(r);
+    }
+
+    private AnalysisReportResponse toDto(AnalysisReport r) {
         return new AnalysisReportResponse(
-                report.getId(),
-                report.getAtsScore(),
-                report.getMatchPercentage(),
-                report.getRecruiterDecision(),
-                report.getFeedback(),
-                report.getCoverLetter(),
-                report.getEmailDraft(),
-                report.getStatus().name(),
-                report.getAnalysisTimestamp()
+                r.getId(),
+                r.getResume() != null ? r.getResume().getId() : null,
+                r.getJobDescription() != null ? r.getJobDescription().getId() : null,
+                r.getAtsScore(),
+                r.getMatchPercentage(),
+                r.getRecruiterDecision(),
+                r.getFeedback(),
+                r.getCoverLetter(),
+                r.getEmailDraft(),
+                r.getInterviewQuestions(),
+                r.getLearningRoadmap(),
+                r.getStatus(),
+                r.getAnalysisTimestamp()
         );
     }
 }
