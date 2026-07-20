@@ -1,6 +1,7 @@
 package com.aiCareerCoach.AiCareer.controller;
 
 import com.aiCareerCoach.AiCareer.dto.analysis.AnalysisJobResponse;
+import com.aiCareerCoach.AiCareer.dto.analysis.AnalysisReportResponse;
 import com.aiCareerCoach.AiCareer.queue.AiJobPayload;
 import com.aiCareerCoach.AiCareer.entity.*;
 import com.aiCareerCoach.AiCareer.enums.AnalysisStatus;
@@ -47,7 +48,18 @@ public class AnalysisController {
     }
 
     @GetMapping("/{id}")
-    public AnalysisReport getReport(@PathVariable Long id) {
-        return analysisReportRepository.findById(id).orElseThrow();
+    public AnalysisReportResponse getReport(@PathVariable Long id) {
+        AnalysisReport report = analysisReportRepository.findById(id).orElseThrow();
+        return new AnalysisReportResponse(
+                report.getId(),
+                report.getAtsScore(),
+                report.getMatchPercentage(),
+                report.getRecruiterDecision(),
+                report.getFeedback(),
+                report.getCoverLetter(),
+                report.getEmailDraft(),
+                report.getStatus().name(),
+                report.getAnalysisTimestamp()
+        );
     }
 }
