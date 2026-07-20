@@ -1,6 +1,5 @@
 package com.aiCareerCoach.AiCareer.queue;
 
-import com.aiCareerCoach.AiCareer.dto.ai.CompleteAnalysisResponse;
 import com.aiCareerCoach.AiCareer.entity.AnalysisReport;
 import com.aiCareerCoach.AiCareer.enums.AnalysisStatus;
 import com.aiCareerCoach.AiCareer.repository.AnalysisReportRepository;
@@ -10,7 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
-
+import com.aiCareerCoach.AiCareer.dto.ai.WorkflowEnvelope;
+import com.aiCareerCoach.AiCareer.dto.ai.WorkflowData;
 import java.math.BigDecimal;
 import java.time.Duration;
 
@@ -68,16 +68,27 @@ public class AiJobListener {
         analysisReportRepository.save(report);
 
         try {
-            CompleteAnalysisResponse result = aiServiceClient.runCompleteAnalysis(
-                    payload.analysisReportId(), payload.resumeText(), payload.jdText());
+            WorkflowEnvelope envelope = aiServiceClient.runWorkflow(
+                    payload.analysisReportId(), payload.resumeText(), payload.jdText(), null);
+            WorkflowData result = envelope.data();
 
-            if (result.atsScore() != null) report.setAtsScore(BigDecimal.valueOf(result.atsScore()));
-            if (result.matchPercent() != null) report.setMatchPercentage(BigDecimal.valueOf(result.matchPercent()));
+            if (result.atsResult() != null && result.atsResult().get("ats_score") != null) {
+                report.setAtsScore(BigDecimal.valueOf(((Number) result.atsResult().get("ats_score")).doubleValue()));
+            }
+            if (result.skillGap() != null && result.skillGap().get("match_percentage") != null) {
+                report.setMatchPercentage(BigDecimal.valueOf(((Number) result.skillGap().get("match_percentage")).doubleValue()));
+            }
             report.setRecruiterDecision(result.recruiterDecision());
-            report.setFeedback(result.feedback());
-            report.setCoverLetter(result.coverLetter());
+            if (result.coverLetter() != null) {
+                report.setCoverLetter((String) result.coverLetter().get("cover_letter"));
+            }
             report.setEmailDraft(result.emailDraft());
-            report.setStatus(AnalysisStatus.valueOf(result.status()));
+            if (result.feedback() != null) {
+                report.setFeedback(String.join("\n", result.feedback()));
+            }
+
+            String status = result.status();
+            report.setStatus("PARTIAL".equals(status) ? AnalysisStatus.PARTIAL : AnalysisStatus.valueOf(status));
 
         } catch (Exception e) {
             report.setStatus(AnalysisStatus.FAILED);

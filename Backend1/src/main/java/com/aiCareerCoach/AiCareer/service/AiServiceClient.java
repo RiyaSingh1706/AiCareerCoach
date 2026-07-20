@@ -14,15 +14,15 @@ public class AiServiceClient {
         this.aiRestClient = aiRestClient;
     }
 
-    public CompleteAnalysisResponse runCompleteAnalysis(Long analysisReportId, String resumeText, String jdText) {
+    public WorkflowEnvelope runWorkflow(Long analysisReportId, String resumeText, String jdText, String companyName) {
         try {
             return aiRestClient.post()
-                    .uri("/complete-analysis")
-                    .body(new CompleteAnalysisRequest(analysisReportId, resumeText, jdText))
+                    .uri("/workflow/run")
+                    .body(new WorkflowRunRequest(resumeText, jdText, analysisReportId, "MEDIUM", companyName))
                     .retrieve()
-                    .body(CompleteAnalysisResponse.class);
+                    .body(WorkflowEnvelope.class);
         } catch (RestClientException e) {
-            throw new AiServiceException("AI service failed during complete analysis", e);
+            throw new AiServiceException("AI service failed during workflow run", e);
         }
     }
 
