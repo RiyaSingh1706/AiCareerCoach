@@ -1,5 +1,6 @@
 package com.aiCareerCoach.AiCareer.config;
 
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +8,11 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class AiClientConfig {
+
+    @Bean
+    public JsonMapper jsonMapper() {
+        return JsonMapper.builder().build();
+    }
 
     @Bean
     public RestClient aiRestClient(@Value("${ai-backend.base-url}") String baseUrl) {
@@ -22,3 +28,4 @@ public class AiClientConfig {
                 .build();
     }
 }
+

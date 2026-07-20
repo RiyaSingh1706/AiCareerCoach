@@ -8,7 +8,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.aiCareerCoach.AiCareer.dto.ai.WorkflowEnvelope;
 import com.aiCareerCoach.AiCareer.dto.ai.WorkflowData;
 import java.math.BigDecimal;
@@ -18,17 +18,17 @@ import java.time.Duration;
 public class AiJobListener {
 
     private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final AiServiceClient aiServiceClient;
     private final AnalysisReportRepository analysisReportRepository;
 
     @Value("${ai.queue.name}")
     private String queueName;
 
-    public AiJobListener(StringRedisTemplate redisTemplate, ObjectMapper objectMapper,
+    public AiJobListener(StringRedisTemplate redisTemplate, JsonMapper jsonMapper,
                          AiServiceClient aiServiceClient, AnalysisReportRepository analysisReportRepository) {
         this.redisTemplate = redisTemplate;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.aiServiceClient = aiServiceClient;
         this.analysisReportRepository = analysisReportRepository;
     }
@@ -46,7 +46,7 @@ public class AiJobListener {
                 String json = redisTemplate.opsForList().rightPop(queueName, Duration.ofSeconds(5));
                 if (json == null) continue;
 
-                AiJobPayload payload = objectMapper.readValue(json, AiJobPayload.class);
+                AiJobPayload payload = jsonMapper.readValue(json, AiJobPayload.class);
                 processJob(payload);
             } catch (Exception e) {
                 System.out.println("AI job processing failed: " + e.getMessage());
