@@ -29,6 +29,13 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<EmailOTP> emailOtps = new ArrayList<>();
+
     @Email
     @NotBlank
     @Column(nullable = false, unique = true, length = 150)
