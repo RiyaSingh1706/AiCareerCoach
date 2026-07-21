@@ -77,12 +77,12 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
 
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
                 // Local development
                 "http://localhost:5173",
 
-                // Vercel frontend
-                "https://YOUR-VERCEL-APP.vercel.app"
+                // Vercel frontend (production + preview deployments)
+                "https://*.vercel.app"
 
                 // Later production domain:
                 // "https://yourdomain.com"
