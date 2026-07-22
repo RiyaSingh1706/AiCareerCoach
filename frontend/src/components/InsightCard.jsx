@@ -12,9 +12,8 @@ export default function InsightCard({
   keywords,
 }) {
   const isApproved = status === "approved";
-
   return (
-    <div className="col-span-4 flex flex-col gap-3.5 rounded-xl border border-border bg-card p-[18px] shadow-sm">
+    <div className="col-span-full flex flex-col gap-3.5 rounded-xl border border-border bg-card p-[18px] shadow-sm sm:col-span-3 lg:col-span-4">
       <div className="flex items-start justify-between">
         <div>
           <div className="text-[13.5px] font-semibold">{role}</div>
@@ -31,7 +30,6 @@ export default function InsightCard({
           {isApproved ? "Approved" : "Rejected"}
         </span>
       </div>
-
       <div className="flex items-center gap-4.5 gap-x-[18px]">
         <ProgressRing percent={matchPercent} color={isApproved ? "#059669" : "#DC2626"} />
         <div>
@@ -41,7 +39,6 @@ export default function InsightCard({
           </div>
         </div>
       </div>
-
       <div className="flex flex-wrap gap-1.5">
         {keywords.map((k) => (
           <span
