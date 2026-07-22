@@ -34,7 +34,7 @@ export default function History() {
         headers: { ...getAuthHeaders() },
       });
       if (!res.ok) throw new Error(`Failed to load history: ${res.status}`);
-      const data = await res.json(); // AnalysisReportResponse[]
+      const data = await res.json();
       setEntries(data);
     } catch (err) {
       console.error(err);
@@ -65,7 +65,7 @@ export default function History() {
   };
 
   return (
-    <main className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title="History"
         subtitle="Every resume analysis you've run."
@@ -82,7 +82,7 @@ export default function History() {
           Loading…
         </div>
       ) : entries.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-16 text-center shadow-sm">
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-10 text-center shadow-sm sm:p-16">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-ink-400">
             <Inbox size={22} />
           </div>
@@ -101,37 +101,37 @@ export default function History() {
               <div key={entry.id} className="rounded-xl border border-border bg-card shadow-sm">
                 <button
                   onClick={() => setExpandedIndex(isOpen ? null : i)}
-                  className="flex w-full items-center gap-3 px-5 py-4 text-left"
+                  className="flex w-full items-center gap-2.5 px-4 py-4 text-left sm:gap-3 sm:px-5"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
                     <FileText size={16} />
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-[13.5px] font-semibold text-ink-900">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13.5px] font-semibold text-ink-900">
                       Analysis #{entry.id}
                     </div>
-                    <div className="text-[12px] text-ink-400">
+                    <div className="truncate text-[12px] text-ink-400">
                       {formatDate(entry.analysisTimestamp)} · {entry.status}
                     </div>
                   </div>
-                  <span className="ml-auto text-[13px] font-semibold text-ink-900">
+                  <span className="ml-auto shrink-0 text-[13px] font-semibold text-ink-900">
                     {entry.atsScore != null ? `${Math.round(entry.atsScore)}/100` : "—"}
                   </span>
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteEntry(entry.id); }}
-                    className="rounded-md p-1.5 text-ink-400 hover:bg-danger-soft hover:text-danger transition-colors"
+                    className="shrink-0 rounded-md p-1.5 text-ink-400 hover:bg-danger-soft hover:text-danger transition-colors"
                     title="Delete entry"
                   >
                     <Trash2 size={14} />
                   </button>
                   <ChevronDown
                     size={16}
-                    className={`text-ink-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-ink-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-border-soft px-5 py-4 pl-[62px] flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 border-t border-border-soft px-4 py-4 sm:pl-[62px] sm:pr-5">
                     <div className="flex items-center justify-between text-[12.5px]">
                       <span className="text-ink-700">Job Match</span>
                       <span className="font-semibold text-ink-900">
