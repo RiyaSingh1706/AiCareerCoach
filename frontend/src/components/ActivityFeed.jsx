@@ -11,7 +11,7 @@ const ICONS = {
 
 export default function ActivityFeed({ items }) {
   return (
-    <div className="col-span-4 rounded-xl border border-border bg-card shadow-sm">
+    <div className="col-span-full rounded-xl border border-border bg-card shadow-sm sm:col-span-6 lg:col-span-4">
       <div className="p-5 pb-0 text-[14.5px] font-semibold">Recent Activity</div>
       {items.length === 0 ? (
         <div className="px-5 py-10 text-center text-[12.5px] text-ink-400">
