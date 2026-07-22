@@ -10,9 +10,8 @@ import {
 
 export default function TrendChart({ data }) {
   const hasData = data.length > 0;
-
   return (
-    <div className="col-span-8 rounded-xl border border-border bg-card shadow-sm">
+    <div className="col-span-full rounded-xl border border-border bg-card shadow-sm sm:col-span-6 lg:col-span-8">
       <div className="flex items-center justify-between p-5 pb-1">
         <div>
           <div className="text-[14.5px] font-semibold">ATS Improvement Trend</div>
@@ -21,13 +20,11 @@ export default function TrendChart({ data }) {
           </div>
         </div>
       </div>
-
       <div className="flex gap-4 px-5 pt-2 text-[12px] text-ink-500">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-primary" /> ATS Score
         </span>
       </div>
-
       {hasData ? (
         <div className="h-[220px] px-3 pb-4 pt-2">
           <ResponsiveContainer width="100%" height="100%">
