@@ -68,6 +68,10 @@ def invoke_with_retry(chain, inputs: dict, max_retries: int = _MAX_RETRIES):
             return chain.invoke(inputs)
 
         except Exception as e:
+            logger.exception("Groq Exception")   # <-- add this
+            print("FULL ERROR:", repr(e))        # <-- add this
+            print("MESSAGE:", str(e))            # <-- add this
+
             error_msg = str(e)
             last_error = e
 
