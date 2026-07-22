@@ -117,15 +117,20 @@ export default function JobDescriptions() {
     );
   });
 
+  const openDetail = (job) => {
+    setSelectedJob(job);
+    setIsDetailDrawerOpen(true);
+  };
+
   return (
-    <main className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title="Job Descriptions"
         subtitle="Every role you've saved to match your resume against."
         action={
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:opacity-95 transition-opacity"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:opacity-95 transition-opacity sm:w-fit"
           >
             <Plus size={14} strokeWidth={2.2} />
             Add Job Description
@@ -140,7 +145,7 @@ export default function JobDescriptions() {
       )}
 
       <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative w-full max-w-md">
           <input
             type="text"
             placeholder="Filter by role or company name..."
@@ -168,86 +173,141 @@ export default function JobDescriptions() {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm animate-fade-in">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="border-b border-border bg-canvas/60 text-[11.5px] font-semibold uppercase tracking-wide text-ink-400">
-                <th className="px-5 py-3">Role</th>
-                <th className="px-5 py-3">Match Score</th>
-                <th className="px-5 py-3">Recruiter Decision</th>
-                <th className="px-5 py-3 text-right" />
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJobs.map((job) => (
-                <tr
-                  key={job.id}
-                  onClick={() => {
-                    setSelectedJob(job);
-                    setIsDetailDrawerOpen(true);
-                  }}
-                  className="border-b border-border-soft last:border-b-0 hover:bg-gray-50/60 transition-colors cursor-pointer"
-                >
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-ink-500">
-                        <Building2 size={15} />
+        <>
+          {/* Mobile: card list */}
+          <div className="flex flex-col gap-3 sm:hidden">
+            {filteredJobs.map((job) => (
+              <div
+                key={job.id}
+                onClick={() => openDetail(job)}
+                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm active:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-ink-500">
+                    <Building2 size={16} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13.5px] font-semibold text-ink-900">{job.jobTitle}</div>
+                    <div className="truncate text-[12px] text-ink-400">{job.company}</div>
+                  </div>
+                  <button
+                    onClick={(e) => handleDeleteJob(job.id, e)}
+                    className="shrink-0 rounded-md p-1.5 text-ink-400 hover:bg-danger-soft hover:text-danger"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                  {job.matchPercentage != null ? (
+                    <div className="flex flex-1 items-center gap-2">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className={`h-full rounded-full ${matchColor(job.matchPercentage)}`}
+                          style={{ width: `${job.matchPercentage}%` }}
+                        />
                       </div>
-                      <div>
-                        <div className="text-[13.5px] font-semibold text-ink-900">{job.jobTitle}</div>
-                        <div className="text-[12px] text-ink-400">{job.company}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {job.matchPercentage != null ? (
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-100">
-                          <div
-                            className={`h-full rounded-full ${matchColor(job.matchPercentage)}`}
-                            style={{ width: `${job.matchPercentage}%` }}
-                          />
-                        </div>
-                        <span className="text-[12.5px] font-semibold text-ink-700">
-                          {Math.round(job.matchPercentage)}%
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-[12px] text-ink-400">Not analyzed yet</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {job.recruiterDecision ? (
-                      <span
-                        className={`rounded-full border px-2.5 py-0.5 text-[11.5px] font-semibold ${
-                          DECISION_STYLE[job.recruiterDecision] || DECISION_STYLE.MAYBE
-                        }`}
-                      >
-                        {job.recruiterDecision}
+                      <span className="shrink-0 text-[12px] font-semibold text-ink-700">
+                        {Math.round(job.matchPercentage)}%
                       </span>
-                    ) : (
-                      <span className="text-[12px] text-ink-400">—</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3.5 text-right">
-                    <button
-                      onClick={(e) => handleDeleteJob(job.id, e)}
-                      className="rounded-md p-1.5 text-ink-400 hover:bg-danger-soft hover:text-danger transition-colors"
-                      title="Delete entry"
+                    </div>
+                  ) : (
+                    <span className="text-[12px] text-ink-400">Not analyzed yet</span>
+                  )}
+
+                  {job.recruiterDecision && (
+                    <span
+                      className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
+                        DECISION_STYLE[job.recruiterDecision] || DECISION_STYLE.MAYBE
+                      }`}
                     >
-                      <Trash2 size={14} />
-                    </button>
-                  </td>
+                      {job.recruiterDecision}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tablet/desktop: table */}
+          <div className="hidden overflow-x-auto rounded-xl border border-border bg-card shadow-sm animate-fade-in sm:block">
+            <table className="w-full min-w-[560px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-border bg-canvas/60 text-[11.5px] font-semibold uppercase tracking-wide text-ink-400">
+                  <th className="px-5 py-3">Role</th>
+                  <th className="px-5 py-3">Match Score</th>
+                  <th className="px-5 py-3">Recruiter Decision</th>
+                  <th className="px-5 py-3 text-right" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredJobs.map((job) => (
+                  <tr
+                    key={job.id}
+                    onClick={() => openDetail(job)}
+                    className="border-b border-border-soft last:border-b-0 hover:bg-gray-50/60 transition-colors cursor-pointer"
+                  >
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-ink-500">
+                          <Building2 size={15} />
+                        </div>
+                        <div>
+                          <div className="text-[13.5px] font-semibold text-ink-900">{job.jobTitle}</div>
+                          <div className="text-[12px] text-ink-400">{job.company}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {job.matchPercentage != null ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-100">
+                            <div
+                              className={`h-full rounded-full ${matchColor(job.matchPercentage)}`}
+                              style={{ width: `${job.matchPercentage}%` }}
+                            />
+                          </div>
+                          <span className="text-[12.5px] font-semibold text-ink-700">
+                            {Math.round(job.matchPercentage)}%
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[12px] text-ink-400">Not analyzed yet</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {job.recruiterDecision ? (
+                        <span
+                          className={`rounded-full border px-2.5 py-0.5 text-[11.5px] font-semibold ${
+                            DECISION_STYLE[job.recruiterDecision] || DECISION_STYLE.MAYBE
+                          }`}
+                        >
+                          {job.recruiterDecision}
+                        </span>
+                      ) : (
+                        <span className="text-[12px] text-ink-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        onClick={(e) => handleDeleteJob(job.id, e)}
+                        className="rounded-md p-1.5 text-ink-400 hover:bg-danger-soft hover:text-danger transition-colors"
+                        title="Delete entry"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl animate-scale-up">
+          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-xl animate-scale-up sm:p-6">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-[15px] font-semibold text-ink-900">Add New Job Description</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="rounded-md p-1 hover:bg-gray-100 text-ink-400">
@@ -287,7 +347,7 @@ export default function JobDescriptions() {
                   className="resize-none rounded-lg border border-border bg-canvas px-3 py-2 text-[13px] text-ink-900 outline-none focus:border-primary"
                 />
               </div>
-              <div className="mt-2 flex justify-end gap-2 border-t border-border pt-4">
+              <div className="mt-2 flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
@@ -308,13 +368,13 @@ export default function JobDescriptions() {
       )}
 
       {isDetailDrawerOpen && selectedJob && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-border bg-card shadow-2xl p-6 flex flex-col animate-slide-left">
+        <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-card p-4 shadow-2xl animate-slide-left sm:p-6">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <div>
-              <h3 className="text-[15px] font-bold text-ink-900">{selectedJob.jobTitle}</h3>
-              <p className="text-[12px] text-ink-500">{selectedJob.company}</p>
+            <div className="min-w-0">
+              <h3 className="truncate text-[15px] font-bold text-ink-900">{selectedJob.jobTitle}</h3>
+              <p className="truncate text-[12px] text-ink-500">{selectedJob.company}</p>
             </div>
-            <button onClick={() => setIsDetailDrawerOpen(false)} className="rounded-md p-1 hover:bg-gray-100 text-ink-400">
+            <button onClick={() => setIsDetailDrawerOpen(false)} className="shrink-0 rounded-md p-1 hover:bg-gray-100 text-ink-400">
               <X size={16} />
             </button>
           </div>
