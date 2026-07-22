@@ -203,7 +203,7 @@ export default function ResumeAnalysis() {
   }[status];
 
   return (
-    <main className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title="Resume Analysis"
         subtitle="Upload a resume and a job description to get an ATS score, match percentage, and AI feedback."
@@ -211,7 +211,7 @@ export default function ResumeAnalysis() {
 
       <div className="grid grid-cols-12 gap-5">
         {/* Upload zone */}
-        <div className="col-span-12 rounded-xl border border-dashed border-border bg-card p-10 text-center shadow-sm animate-fade-in">
+        <div className="col-span-12 rounded-xl border border-dashed border-border bg-card p-6 text-center shadow-sm animate-fade-in sm:p-10">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
             <UploadCloud size={22} />
           </div>
@@ -241,13 +241,13 @@ export default function ResumeAnalysis() {
           </div>
 
           {file && (
-            <div className="mt-2 text-[12px] text-ink-500 font-medium">Selected File: {file.name}</div>
+            <div className="mt-2 truncate text-[12px] font-medium text-ink-500">Selected File: {file.name}</div>
           )}
         </div>
 
         {/* JD input — required upfront since the backend needs both resume + JD to run analysis */}
         {file && status !== "done" && (
-          <div className="col-span-12 flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm animate-slide-up">
+          <div className="col-span-12 flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm animate-slide-up sm:p-6">
             <div className="text-[14.5px] font-semibold text-ink-900 border-b border-border-soft pb-2">
               Job you're applying for
             </div>
@@ -295,7 +295,7 @@ export default function ResumeAnalysis() {
             <button
               onClick={runAnalysis}
               disabled={!jdRole.trim() || !jdCompany.trim() || !jdText.trim() || isBusy}
-              className="flex w-fit items-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-60 sm:w-fit sm:justify-start"
             >
               {isBusy ? (
                 <>
@@ -319,39 +319,44 @@ export default function ResumeAnalysis() {
         {/* Results */}
         {status === "done" && report && (
           <>
-            <div className="col-span-12 flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm animate-slide-up">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
-                <FileText size={18} />
-              </div>
-              <div className="min-w-0">
-                <div className="text-[13.5px] font-semibold text-ink-900 truncate">{file.name}</div>
-                <div className="text-[12px] text-ink-400">
-                  {jdRole} at {jdCompany}
+            <div className="col-span-12 flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm animate-slide-up sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                  <FileText size={18} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13.5px] font-semibold text-ink-900 truncate">{file.name}</div>
+                  <div className="text-[12px] text-ink-400 truncate">
+                    {jdRole} at {jdCompany}
+                  </div>
                 </div>
               </div>
-              <span className="ml-auto flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-[11.5px] font-semibold text-success">
+
+              <span className="flex w-fit items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-[11.5px] font-semibold text-success sm:ml-auto">
                 <CheckCircle2 size={13} />
                 {report.status === "PARTIAL" ? "Partially complete" : "Analysis complete"}
               </span>
 
-              <button
-                onClick={downloadReport}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-canvas px-3 py-2 text-[12.5px] font-semibold text-ink-700 hover:bg-gray-50 transition-colors"
-              >
-                <Download size={13} />
-                Download report
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={downloadReport}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-canvas px-3 py-2 text-[12.5px] font-semibold text-ink-700 hover:bg-gray-50 transition-colors sm:flex-none"
+                >
+                  <Download size={13} />
+                  Download report
+                </button>
 
-              <button
-                onClick={handleReset}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-canvas px-3 py-2 text-[12.5px] font-semibold text-ink-700 hover:bg-gray-50 transition-colors"
-              >
-                <RotateCcw size={13} />
-                Start over
-              </button>
+                <button
+                  onClick={handleReset}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-canvas px-3 py-2 text-[12.5px] font-semibold text-ink-700 hover:bg-gray-50 transition-colors sm:flex-none"
+                >
+                  <RotateCcw size={13} />
+                  Start over
+                </button>
+              </div>
             </div>
 
-            <div className="col-span-12 md:col-span-6 flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="col-span-12 md:col-span-6 flex flex-col gap-5 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
               <div className="text-[14.5px] font-semibold text-ink-900 border-b border-border-soft pb-2">
                 Scores
               </div>
@@ -369,7 +374,7 @@ export default function ResumeAnalysis() {
               )}
             </div>
 
-            <div className="col-span-12 md:col-span-6 flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="col-span-12 md:col-span-6 flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
               <div className="flex items-center gap-2 text-[14.5px] font-semibold text-ink-900 border-b border-border-soft pb-2">
                 <AlertTriangle size={16} className="text-orange-500" />
                 Feedback
@@ -388,7 +393,7 @@ export default function ResumeAnalysis() {
             </div>
 
             {report.coverLetter && (
-              <div className="col-span-12 flex flex-col gap-2 rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="col-span-12 flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
                 <div className="text-[14.5px] font-semibold text-ink-900 border-b border-border-soft pb-2">
                   Generated Cover Letter
                 </div>
@@ -397,7 +402,7 @@ export default function ResumeAnalysis() {
             )}
 
             {report.emailDraft && (
-              <div className="col-span-12 flex flex-col gap-2 rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="col-span-12 flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
                 <div className="text-[14.5px] font-semibold text-ink-900 border-b border-border-soft pb-2">
                   Draft Outreach Email
                 </div>
