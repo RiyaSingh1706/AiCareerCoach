@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
-// ---- Question bank: category -> difficulty -> questions ----
 const questionBank = {
   Behavioral: {
     easy: [
@@ -70,7 +69,6 @@ const DIFFICULTIES = ["easy", "medium", "hard"];
 const QUESTION_COUNTS = [3, 5, 7];
 const HISTORY_KEY = "mockInterviewSessions";
 
-// Very simple heuristic "AI feedback" mock — swap for a real backend call later
 function getMockFeedback(answer) {
   const words = answer.trim().split(/\s+/).filter(Boolean).length;
   if (words === 0) {
@@ -95,7 +93,6 @@ function scoreFromAnswers(answers) {
 }
 
 export default function InterviewPrep() {
-  // ---- existing question browser state ----
   const [openCategory, setOpenCategory] = useState("Behavioral");
   const [browseQuestions, setBrowseQuestions] = useState(() =>
     Object.fromEntries(
@@ -104,8 +101,7 @@ export default function InterviewPrep() {
   );
   const [regenerating, setRegenerating] = useState(false);
 
-  // ---- mock interview flow state ----
-  const [view, setView] = useState("browse"); // browse | setup | session | summary
+  const [view, setView] = useState("browse");
   const [setupCategory, setSetupCategory] = useState("Behavioral");
   const [setupDifficulty, setSetupDifficulty] = useState("medium");
   const [setupCount, setSetupCount] = useState(3);
@@ -130,7 +126,6 @@ export default function InterviewPrep() {
     }
   }, []);
 
-  // ---- Regenerate: reshuffle displayed questions in the browser ----
   const regenerate = async () => {
     setRegenerating(true);
     await new Promise((r) => setTimeout(r, 700));
@@ -144,7 +139,6 @@ export default function InterviewPrep() {
     setRegenerating(false);
   };
 
-  // ---- "Practice this set" jumps into setup, prefilled with that category ----
   const startSetupFor = (category) => {
     setSetupCategory(category);
     setView("setup");
@@ -153,7 +147,6 @@ export default function InterviewPrep() {
   const startSession = () => {
     const pool = questionBank[setupCategory][setupDifficulty];
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    // repeat/pad the pool if user asks for more questions than we have
     const picked = Array.from({ length: setupCount }, (_, i) => shuffled[i % shuffled.length]);
 
     setSessionQuestions(picked);
@@ -167,7 +160,6 @@ export default function InterviewPrep() {
 
   const submitAnswer = async () => {
     setSubmitting(true);
-    // Mock "AI evaluating your answer" delay — replace with a real Gemini/LangChain call later
     await new Promise((r) => setTimeout(r, 900));
 
     const feedback = getMockFeedback(currentAnswer);
@@ -214,12 +206,12 @@ export default function InterviewPrep() {
   // ================= SETUP VIEW =================
   if (view === "setup") {
     return (
-      <main className="flex flex-col gap-6 p-6">
+      <main className="flex flex-col gap-6 p-4 sm:p-6">
         <PageHeader title="Start a Mock Interview" subtitle="Set up your practice session." />
-        <div className="col-span-12 flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm max-w-xl">
+        <div className="flex w-full max-w-xl flex-col gap-5 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
           <div>
             <div className="mb-2 text-[13px] font-semibold text-ink-900">Category</div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {Object.keys(questionBank).map((cat) => (
                 <button
                   key={cat}
@@ -238,7 +230,7 @@ export default function InterviewPrep() {
 
           <div>
             <div className="mb-2 text-[13px] font-semibold text-ink-900">Difficulty</div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {DIFFICULTIES.map((d) => (
                 <button
                   key={d}
@@ -257,7 +249,7 @@ export default function InterviewPrep() {
 
           <div>
             <div className="mb-2 text-[13px] font-semibold text-ink-900">Number of questions</div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {QUESTION_COUNTS.map((n) => (
                 <button
                   key={n}
@@ -274,10 +266,10 @@ export default function InterviewPrep() {
             </div>
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:gap-3">
             <button
               onClick={startSession}
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
             >
               <Play size={14} />
               Start Interview
@@ -300,7 +292,7 @@ export default function InterviewPrep() {
     const isLast = currentIndex === sessionQuestions.length - 1;
 
     return (
-      <main className="flex flex-col gap-6 p-6">
+      <main className="flex flex-col gap-6 p-4 sm:p-6">
         <PageHeader
           title="Mock Interview in progress"
           subtitle={`${setupCategory} · ${setupDifficulty} · Question ${currentIndex + 1} of ${sessionQuestions.length}`}
@@ -313,9 +305,9 @@ export default function InterviewPrep() {
           />
         </div>
 
-        <div className="flex max-w-2xl flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${CATEGORY_COLOR[setupCategory]}`}>
+        <div className="flex w-full max-w-2xl flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
+          <div className="flex items-start gap-2">
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${CATEGORY_COLOR[setupCategory]}`}>
               <MessagesSquare size={16} />
             </div>
             <div className="text-[14px] font-semibold text-ink-900">{question}</div>
@@ -332,7 +324,7 @@ export default function InterviewPrep() {
           <button
             onClick={submitAnswer}
             disabled={submitting}
-            className="flex w-fit items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm disabled:opacity-60 sm:w-fit sm:justify-start"
           >
             {submitting ? (
               <>
@@ -356,10 +348,10 @@ export default function InterviewPrep() {
     const delta = lastSessionScore !== null ? finalScore - lastSessionScore : null;
 
     return (
-      <main className="flex flex-col gap-6 p-6">
+      <main className="flex flex-col gap-6 p-4 sm:p-6">
         <PageHeader title="Session Summary" subtitle={`${setupCategory} · ${setupDifficulty}`} />
 
-        <div className="flex max-w-2xl items-center gap-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex w-full max-w-2xl flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:gap-6 sm:p-6">
           <div>
             <div className="text-[12.5px] text-ink-500">Overall score</div>
             <div className="text-[32px] font-bold tracking-tight">{finalScore}%</div>
@@ -376,14 +368,14 @@ export default function InterviewPrep() {
           )}
         </div>
 
-        <div className="flex max-w-2xl flex-col gap-4">
+        <div className="flex w-full max-w-2xl flex-col gap-4">
           {sessionQuestions.map((q, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div key={i} className="rounded-xl border border-border bg-card p-4 shadow-sm sm:p-5">
               <div className="text-[13px] font-semibold text-ink-900">Q{i + 1}. {q}</div>
               <div className="mt-2 text-[13px] text-ink-700">
                 {answers[i]?.trim() ? answers[i] : <span className="text-ink-400">No answer given</span>}
               </div>
-              <div className="mt-3 flex items-start gap-2">
+              <div className="mt-3 flex flex-col items-start gap-1.5 sm:flex-row sm:items-start sm:gap-2">
                 <span className={`rounded-md px-2 py-1 text-[11px] font-semibold ${feedbacks[i]?.tone}`}>
                   {feedbacks[i]?.label}
                 </span>
@@ -393,10 +385,10 @@ export default function InterviewPrep() {
           ))}
         </div>
 
-        <div className="flex max-w-2xl gap-3">
+        <div className="flex w-full max-w-2xl flex-col gap-2 sm:flex-row sm:gap-3">
           <button
             onClick={restart}
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
+            className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
           >
             <RotateCcw size={14} />
             Practice Again
@@ -414,23 +406,23 @@ export default function InterviewPrep() {
 
   // ================= BROWSE VIEW (default) =================
   return (
-    <main className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title="Interview Prep"
         subtitle="Practice questions generated from your target role: Senior Frontend Engineer at Linear."
         action={
-          <div className="flex gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
             <button
               onClick={regenerate}
               disabled={regenerating}
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2.5 text-[13px] font-semibold text-ink-700 shadow-sm disabled:opacity-60"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2.5 text-[13px] font-semibold text-ink-700 shadow-sm disabled:opacity-60"
             >
               {regenerating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
               Regenerate
             </button>
             <button
               onClick={() => setView("setup")}
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm"
             >
               <Play size={14} />
               Start Mock Interview
@@ -440,8 +432,8 @@ export default function InterviewPrep() {
       />
 
       {history.length > 0 && (
-        <div className="flex items-center gap-2 text-[12.5px] text-ink-500">
-          <CheckCircle2 size={14} className="text-success" />
+        <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+          <CheckCircle2 size={14} className="shrink-0 text-success" />
           Last session: {history[history.length - 1].category} ({history[history.length - 1].difficulty}) —{" "}
           <span className="font-semibold text-ink-900">{history[history.length - 1].score}%</span>
         </div>
@@ -454,26 +446,26 @@ export default function InterviewPrep() {
             <div key={catName} className="rounded-xl border border-border bg-card shadow-sm">
               <button
                 onClick={() => setOpenCategory(isOpen ? null : catName)}
-                className="flex w-full items-center gap-3 px-5 py-4 text-left"
+                className="flex w-full items-center gap-3 px-4 py-4 text-left sm:px-5"
               >
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${CATEGORY_COLOR[catName]}`}>
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${CATEGORY_COLOR[catName]}`}>
                   <MessagesSquare size={16} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[14px] font-semibold text-ink-900">{catName}</div>
                   <div className="text-[12px] text-ink-400">{questions.length} questions</div>
                 </div>
                 <ChevronDown
                   size={16}
-                  className={`ml-auto text-ink-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  className={`ml-auto shrink-0 text-ink-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
               {isOpen && (
-                <div className="flex flex-col gap-3 border-t border-border-soft px-5 py-4 pl-[68px]">
+                <div className="flex flex-col gap-3 border-t border-border-soft px-4 py-4 sm:pl-[68px] sm:pr-5">
                   {questions.map((q, i) => (
                     <div key={i} className="flex gap-3 text-[13.5px] leading-relaxed text-ink-700">
-                      <span className="font-semibold text-ink-400">Q{i + 1}</span>
+                      <span className="shrink-0 font-semibold text-ink-400">Q{i + 1}</span>
                       {q}
                     </div>
                   ))}
