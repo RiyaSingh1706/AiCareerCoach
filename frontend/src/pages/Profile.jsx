@@ -54,13 +54,13 @@ export default function Profile() {
   };
 
   return (
-    <main className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader title="Profile" subtitle="Manage your account details and preferences." />
 
-      <div className="grid grid-cols-12 gap-5">
-        <div className="col-span-8 flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:col-span-8">
           <div className="text-[14.5px] font-semibold">Account details</div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
             <Field label="Email" value={currentUser?.email || ""} type="email" />
             <Field label="Target role" value={targetRole} onChange={(e) => setTargetRole(e.target.value)} />
@@ -70,7 +70,7 @@ export default function Profile() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="w-fit rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm disabled:opacity-60"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm disabled:opacity-60 sm:w-fit"
             >
               {saving ? "Saving..." : "Save changes"}
             </button>
@@ -78,7 +78,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="col-span-4 flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:col-span-4">
           <div className="text-[14.5px] font-semibold">Plan</div>
           <div className="rounded-lg bg-primary-soft p-4">
             <div className="text-[13px] font-semibold text-primary">Free plan</div>
